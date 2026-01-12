@@ -137,9 +137,9 @@ void StartDefaultTask(void *argument)
   {
 
     HAL_GPIO_WritePin(TEST_LED_GPIO_Port, TEST_LED_Pin, GPIO_PIN_SET);
-    vTaskDelay(1000);
+    vTaskDelay(500);
     HAL_GPIO_WritePin(TEST_LED_GPIO_Port, TEST_LED_Pin, GPIO_PIN_RESET);
-    vTaskDelay(1000);
+    vTaskDelay(500);
   }
   /* USER CODE END StartDefaultTask */
 }
