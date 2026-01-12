@@ -24,3 +24,6 @@ JLinkLog.txt
 
 # 4. 忽略临时备份文件
 *.bak
+
+# 5. 忽略 VS Code 的本地配置和日志
+.vscode/
