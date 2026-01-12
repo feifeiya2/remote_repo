@@ -1,0 +1,26 @@
+# 1. 忽略编译产生的垃圾 (中间文件)
+*.o
+*.d
+*.crf
+*.dep
+*.map
+*.htm
+*.lnp
+*.sct
+*.lst
+*.obj
+
+# 2. 忽略最终的可执行文件 (因为随时可以重新编译出来)
+*.hex
+*.axf
+*.bin
+*.elf
+
+# 3. 忽略 Keil/IDE 产生的用户配置 (别人不需要你的窗口布局)
+*.uvoptx
+*.uvguix.*
+*.scvd
+JLinkLog.txt
+
+# 4. 忽略临时备份文件
+*.bak
