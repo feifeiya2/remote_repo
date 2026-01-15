@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +57,7 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+TaskHandle_t test_handle;
 
 /* USER CODE END FunctionPrototypes */
 
@@ -66,8 +67,11 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
 void vApplicationIdleHook(void);
+void vApplicationTickHook(void);
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 
 /* USER CODE BEGIN 2 */
+  void test_stack_overflow(void* argument);
 void vApplicationIdleHook( void )
 {
    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
@@ -81,6 +85,32 @@ void vApplicationIdleHook( void )
    memory allocated by the kernel to any task that has since been deleted. */
 }
 /* USER CODE END 2 */
+
+/* USER CODE BEGIN 3 */
+void vApplicationTickHook( void )
+{
+   /* This function will be called by each tick interrupt if
+   configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h. User code can be
+   added here, but the tick hook is called from an interrupt context, so
+   code must not attempt to block, and only the interrupt safe FreeRTOS API
+   functions can be used (those that end in FromISR()). */
+}
+/* USER CODE END 3 */
+
+/* USER CODE BEGIN 4 */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
+  while(1){
+     printf("Error: Stack overflow in task: %s\r\n", pcTaskName);
+     vTaskDelay(1000);
+  }
+
+
+}
+/* USER CODE END 4 */
 
 /**
   * @brief  FreeRTOS initialization
@@ -114,6 +144,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  xTaskCreate(test_stack_overflow, "SOF", 256, NULL, osPriorityHigh, &test_handle);
+
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -146,6 +178,26 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+  void f(void){
+    vTaskDelay(200);
+
+    printf("%s          %d\r\n", pcTaskGetTaskName(test_handle), uxTaskGetStackHighWaterMark(test_handle));
+    f();
+
+        // --- 加这一句 ---
+    // volatile 关键字防止被优化掉，强制函数必须返回来执行这个指令
+    volatile int dummy = 0; 
+    (void)dummy;
+  }
+
+  void test_stack_overflow(void* argument){
+    // while(1){
+    //   printf("Stack overflow test task running...\r\n");
+    //   vTaskDelay(1000);
+    // }
+    f();
+  }
+
 
 /* USER CODE END Application */
 
